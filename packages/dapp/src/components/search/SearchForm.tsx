@@ -28,7 +28,7 @@ export const SearchForm: React.FC<{
   const navigate = useNavigate()
 
   return (
-    <Box>
+    <Box pad={{bottom:'medium'}} >
       <Grid
         fill='horizontal'
         responsive

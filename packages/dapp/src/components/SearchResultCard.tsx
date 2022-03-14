@@ -2,30 +2,27 @@ import { useContext } from 'react';
 import { Box, Text, ResponsiveContext, Image, Grid, Button } from 'grommet';
 import Logger from '../utils/logger';
 import type { LodgingFacility } from 'stays-data-models'
-import { useNavigate, useLocation, Navigate } from 'react-router-dom';
-
-//FAKE DATA
-import { faker } from 'stays-data-models';
-const {
-  iterator,
-  createFakeSpace,
-  createFakeLodgingFacility,
-} = faker;
+import { useNavigate } from 'react-router-dom';
+import { useAppState } from '../store';
+import { ThemeMode } from './SwitchThemeMode';
 
 // Initialize logger
 const logger = Logger('Account');
 
-export const SearchResultCard: React.FC<{ lodgingFacility?: LodgingFacility }> = ({ }) => {
+export const SearchResultCard: React.FC<{ lodgingFacility: LodgingFacility }> = ({ lodgingFacility }) => {
+  const { themeMode } = useAppState();
   const size = useContext(ResponsiveContext);
-  const lodgingFacility = createFakeLodgingFacility()
-  const space = createFakeSpace()
+  console.log('----->HERE:lodgingFacility', lodgingFacility)
   const navigate = useNavigate();
   return (
     <Box
-      border
+      border={{ color: themeMode === ThemeMode.light ? 'brand' : 'accent-1', size: 'small' }}
       direction='row'
+      round='small'
       align='center'
-      margin='small'
+      overflow='hidden'
+      background={{ color: `${themeMode}-1` }}
+      margin={{ horizontal: 'small', vertical: 'medium' }}
     >
       <Grid
         responsive
@@ -59,11 +56,11 @@ export const SearchResultCard: React.FC<{ lodgingFacility?: LodgingFacility }> =
           lordem
         </Box>
         <Box pad={{ right: 'medium' }} direction='row' justify='between' align='center' gridArea="action">
-          <Text size='large'>From: {space.pricePerNight}</Text>
+          <Text size='large'>From: $$$</Text>
           <Button
             size='large'
             label='Check Spaces'
-            onClick={() => navigate(`/space/${space.id}`)}
+            onClick={() => navigate(`/space/${lodgingFacility.id}`)}
           />
         </Box>
       </Grid>

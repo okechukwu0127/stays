@@ -2,13 +2,16 @@ import { PageWrapper } from './PageWrapper';
 import { SearchForm } from '../components/search/SearchForm';
 import { Box } from 'grommet';
 import { SearchResultCard } from '../components/SearchResultCard';
+import { useAppState } from '../store';
 
 export const Search = () => {
+  const { lodgingFacilities } = useAppState();
+
   const searchParams = new URLSearchParams(window.location.search)
   const departureDate = searchParams.get('departureDate')
   const returnDate = searchParams.get('returnDate')
   const guestsAmount = searchParams.get('guestsAmount')
-  const searchResults = ['asd','asd2','asd3']
+
   return (
     <PageWrapper
       breadcrumbs={[
@@ -18,16 +21,16 @@ export const Search = () => {
         }
       ]}
     >
-      <Box flex={true} align='center' overflow='auto'>
-        <Box flex={false} width='xxlarge'>
+      {/* <Box flex={true} align='center' overflow='auto'>
+        <Box flex={false} width='xxlarge'> */}
           <SearchForm
             initReturnDate={returnDate}
             initDepartureDate={departureDate}
             initGuestsAmount={guestsAmount}
           />
-          {searchResults.map(() => <SearchResultCard />)}
-        </Box>
-      </Box>
+          {lodgingFacilities.map((facility) => <SearchResultCard lodgingFacility={facility} />)}
+        {/* </Box>
+      </Box> */}
     </PageWrapper>
   );
 };

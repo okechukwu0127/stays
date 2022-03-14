@@ -1,19 +1,26 @@
 import type { Space as SpaceType } from 'stays-data-models';
 import { PageWrapper } from './PageWrapper';
-import { Box, Text, Button, ResponsiveContext, Image, Card, Grid, InfiniteScroll, Carousel, Tabs, Tab } from 'grommet';
+import { Tag, Box, Text, Button, ResponsiveContext, Image, Card, Grid, InfiniteScroll, Carousel, Tabs, Tab, List } from 'grommet';
+import { useAppState } from '../store';
+import { useState, useMemo } from 'react';
+import { type } from 'os';
+import { ThemeMode } from '../components/SwitchThemeMode';
 
-//FAKE DATA
-import { faker } from 'stays-data-models';
-const {
-  iterator,
-  createFakeSpace,
-  createFakeLodgingFacility,
-} = faker;
+export const Space: React.FC = () => {
+  const { lodgingFacilities, themeMode } = useAppState();
+  const searchParams = window.location.pathname.substring(7)
+  const [index, setIndex] = useState(0)
+  const lodgingFacility = lodgingFacilities.find((facility) => facility.id === searchParams)
+  // useEffect(() => {
+  //   setSpace
+  // })
+  const space = useMemo(() => lodgingFacility?.spaces[index], [index])
 
-export const Space = () => {
-  const searchParams = new URLSearchParams(window.location.search)
-  const lodgingFacility = createFakeLodgingFacility()
-  const space = createFakeSpace()
+  if (lodgingFacility === undefined) {
+    return <></>
+  }
+  console.log('---HERE PARAMS', searchParams)
+  const borderColor = themeMode === ThemeMode.light ? 'brand' : 'accent-1'
   return (
     <PageWrapper
       breadcrumbs={[
@@ -23,65 +30,67 @@ export const Space = () => {
         }
       ]}
     >
-      <Box
-        border
+      {space === undefined ? <>Space not found</> : <Box
+        border={{color:borderColor}}
         flex={true}
-        align='center'
+        align='start'
         overflow='auto'
-        pad='small'
+        pad='medium'
+        round='small'
       >
-        <Box flex={false} width='xxlarge' >
-          <Box pad={{ bottom: 'small' }}>
-            <Text size='xxlarge'>
-              {lodgingFacility.alternativeName}
-            </Text>
-            <Text size='large'>
-              {lodgingFacility.locations === undefined ? '' : lodgingFacility.locations[0].address.locality}
-            </Text>
+        <Box pad={{ bottom: 'small' }}>
+          <Text size='xxlarge'>
+            {space.name}
+          </Text>
+          <Text size='large'>
+            {space.address === undefined ? '' : <Box>
+              <Text>{space.address.country}</Text>
+              <Text>{space.address.locality}</Text>
+              <Text>{space.address.streetAddress}</Text>
+            </Box>}
+          </Text>
+        </Box>
+        <Box width='100%' align='center' gridArea="img" height="xlarge" pad={{ bottom: 'medium' }}>
+          <Carousel height='xxlarge' width='xlarge'>
+            {space.media.images?.map((space) =>
+              <Image
+                width='xlarge'
+                fit="cover"
+                alignSelf='center'
+                src={space.uri}
+              />
+            )}
+          </Carousel>
+        </Box>
+        <Box pad={{ bottom: 'small' }}>
+          <Text size='xxlarge'>
+            Info
+          </Text>
+        </Box>
+        <Box pad={{ bottom: 'medium', left: 'small' }}>
+          <Text>{space.longDescription}</Text>
+        </Box>
+        <Box>
+          <Box pad={{ bottom: 'small' }} direction='row'>
+            <Text size='xxlarge'>Room type</Text>
           </Box>
-          <Box gridArea="img" height="large" pad={{ bottom: 'medium' }}>
-            <Carousel>
-              { }
-              {space.media.images?.map((space) =>
-                <Image
-                  fit="cover"
-                  src={space.uri}
-                />
-              )}
-            </Carousel>
-          </Box>
-          <Box pad={{ bottom: 'small' }}>
-            <Text size='xxlarge'>
-              Info
-            </Text>
-          </Box>
-          <Box pad={{ bottom: 'medium', left: 'small' }}>
-            <Text>lasd asda as dsa dads  sad asdasd sadas dsadasd asd as d asd asd asdasd asd asd asd asd asd as dasd </Text>
-          </Box>
-          <Box>
-            <Box pad={{ bottom: 'small' }}>
-              <Text size='xxlarge'>Room type</Text>
-            </Box>
-            <Tabs alignControls='start'>
-              {/* {(lodgingFacility.spaces as SpaceType[]).map((space) => )} */}
-              <Tab title={space.type}>
-                <Box width='100%' pad="medium">
-                  <Text>{space.description}</Text>
-                  <Text size='large'>From: {space.pricePerNight ?? '$$$'} DAI</Text>
-                  <Button
-                    size='large'
-                    label='Book with DAI'
-                    onClick={() => console.log(`/space/${space.id}`)}
-                  />
-                </Box>
-              </Tab>
-            </Tabs>
-          </Box>
-          <Box pad={{ right: 'medium' }} direction='row' justify='between' align='center' gridArea="action">
-
+          <Box pad={{ bottom: 'small' }} direction='row'>
+            {space.type?.map((t) => <Tag value={t} />)}
           </Box>
         </Box>
+        <Box pad={{ right: 'medium' }} direction='row' justify='between' align='center' gridArea="action">
+
+        </Box>
+        <Box pad={{ right: 'medium' }} direction='row' width='100%' justify='between' align='center' gridArea="action">
+          <Text>Price per Night: <Text color={borderColor} size='large'>{parseInt('space.pricePerNightWei', 12)} DAI</Text></Text>
+          <Button
+            size='large'
+            label='Buy with DAI'
+            onClick={() => console.log(`/space/${space.id}`)}
+          />
+        </Box>
       </Box>
+      }
     </PageWrapper>
   );
 };
